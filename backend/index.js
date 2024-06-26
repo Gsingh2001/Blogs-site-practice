@@ -5,9 +5,11 @@ const app = express();
 
 app.use(express.json());
 
+
 app.get("/", (req, res) => {
     res.json("Hello!");
 });
+
 
 app.get("/books", (req, res) => {
     const q = "SELECT * FROM books";
@@ -20,31 +22,36 @@ app.get("/books", (req, res) => {
     });
 });
 
-
 app.post("/books", (req, res) => {
-    const q = "INSERT INTO books (title, `desc`) VALUES (?)";
-    const values = [
-        req.body.title,
-        req.body.desc
+    const { title, description } = req.body;
+    const q = "INSERT INTO books (title, `description`) VALUES (?, ?)";
+    const values = [title, description];
 
-    ];
-    console.log(req.body.title);
-    db.query(q, [values], (err, data) => {
-        if (err) return res.json(err);
-        return res.json(data);
+    db.query(q, values, (err, data) => {
+        if (err) {
+            console.error("Error inserting book:", err);
+            return res.status(500).json({ error: "Error inserting book" }); 
+        }
+        return res.json({ message: "Book inserted successfully", bookId: data.insertId });
     });
 });
+
+
 
 app.delete("/books/:id", (req, res) => {
     const bookId = req.params.id;
-    const q = "DELETE FROM books WHERE idbooks = ?";
+    const q = "DELETE FROM books WHERE id = ?";
 
     db.query(q, [bookId], (err, data) => {
-        if (err) return res.json(err);
-        return res.json("Book Deleted Successfully");
+        if (err) {
+            console.error("Error deleting book:", err);
+            return res.status(500).json({ error: "Internal Server Error" });
+        }
+        return res.json({ message: "Book deleted successfully" });
     });
 });
 
-app.listen(8801, () => {
-    console.log("Server is running on port 8801");
+const PORT = 8801;
+app.listen(PORT, () => {
+    console.log(`Server is running on port ${PORT}`);
 });
