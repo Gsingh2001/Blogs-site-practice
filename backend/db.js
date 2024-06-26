@@ -1,10 +1,14 @@
 import mysql from "mysql2";
+import dotenv from "dotenv";
+
+dotenv.config(); // Load environment variables from .env file
 
 const db = mysql.createConnection({
-    host: "localhost",
-    user: "root",
-    password: "1234",
-    database: "test"
+    host: process.env.DB_HOST,
+    user: process.env.DB_USER,
+    password: process.env.DB_PASSWORD,
+    database: process.env.DB_DATABASE,
+    port: parseInt(process.env.DB_PORT) // Convert port to integer if necessary
 });
 
 db.connect((err) => {
