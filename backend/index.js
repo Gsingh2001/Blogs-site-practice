@@ -12,18 +12,23 @@ app.get("/", (req, res) => {
 app.get("/books", (req, res) => {
     const q = "SELECT * FROM books";
     db.query(q, (err, data) => {
-        if (err) return res.json(err);
+        if (err) {
+            console.error("Error querying books:", err);
+            return res.status(500).json({ error: "Internal Server Error" });
+        }
         return res.json(data);
     });
 });
+
 
 app.post("/books", (req, res) => {
     const q = "INSERT INTO books (title, `desc`) VALUES (?)";
     const values = [
         req.body.title,
         req.body.desc
-    ];
 
+    ];
+    console.log(req.body.title);
     db.query(q, [values], (err, data) => {
         if (err) return res.json(err);
         return res.json(data);
